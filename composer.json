@@ -13,7 +13,8 @@
     ],
     "require": {
         "php": ">=7.3.0",
-        "guzzlehttp/guzzle": "~7.0"
+        "guzzlehttp/guzzle": "~7.0",
+        "ext-json": "*"
     }
 
 }
