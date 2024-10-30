@@ -91,17 +91,9 @@ class SudGameRequestApi
         $client = new \GuzzleHttp\Client();
         $response = $client->get($url);
 
-        $ret = json_decode($response, true);
-
-        return $ret;
+        return json_decode($response, true);
     }
 
-    public function httpFetchGet($url,$data =[])
-    {
-        $client = new \GuzzleHttp\Client();
-        $response = $client->get($url);
-        return $response->getBody();
-    }
 
     public function random(int $length = 16): string
     {
@@ -178,8 +170,7 @@ class SudGameRequestApi
 
         $json = $this->getCurlData($url, $body);
 
-        $ret = json_decode($json, true);
-        return $ret;
+        return json_decode($json, true);
 
     }
 
@@ -221,9 +212,7 @@ class SudGameRequestApi
         ];
         $json = $this->getCurlData($url, $body);
 
-        $ret = json_decode($json, true);
-
-        return $ret;
+        return json_decode($json, true);
     }
 
     /**
@@ -251,9 +240,7 @@ class SudGameRequestApi
         ];
 
         $json = $this->getCurlData($url, $body);
-        $ret = json_decode($json, true);
-
-        return $ret;
+        return json_decode($json, true);
     }
 
     /**
@@ -319,20 +306,15 @@ class SudGameRequestApi
      * @see https://docs.sud.tech/zh-CN/app/Client/Languages/    语言 zh-CN en-US hi-IN   id-ID  zh-TW
      * 服务端消息里的language字段，只有你画我猜这类游戏，有用
      * @param string $mg_id 游戏id SudGameConst::
-     * @param int $partyId party_room_info'id
      * @param int $userId
      * @param int $seatIndex 哪个座位  ，默认 -1随机
      * @param int $teamId 1或2  分队伍游戏 默认1
      */
-    public function userJoinGame(int $userId, int $roomId, string $mg_id, int $seatIndex = -1, int $teamId = 1)
+    public function userJoinGame(string $userToken,string $language, int $roomId, string $mg_id, int $seatIndex = -1, int $teamId = 1)
     {
 
-        //根据用户id拿token
-        $token = $this->getUserToken($userId);
-        $language = $this->getSubGameLanguage($userId);
-
         $body = [
-            'code' => $token,//用户token
+            'code' => $userToken,//用户token
             'room_id' => (string)$roomId,//房间ID
             'mode' => 1,//模式 默认: 1
             'language' => $language,//
@@ -345,9 +327,7 @@ class SudGameRequestApi
         if ($seatIndex != -1) { // 不随机
             $body['is_seat_random'] = false;
         }
-        $ret = $this->pushEventToMgServer('user_in', $mg_id, $body);
-
-        return $ret;
+        return $this->pushEventToMgServer('user_in', $mg_id, $body);
     }
 
     /**
@@ -420,9 +400,7 @@ class SudGameRequestApi
             'report_game_info_key' => (string)$extras, // 透传参数key，最大长度64字节，接入方服务端，可以根据这个字段来查询一局游戏的数据
         ];
 
-        $ret = $this->pushEventToMgServer('game_start', $mg_id, $body);
-
-        return $ret;
+        return $this->pushEventToMgServer('game_start', $mg_id, $body);
     }
 
     /**
@@ -457,13 +435,12 @@ class SudGameRequestApi
     /**
      * 游戏结束
      * @see https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/CaptainChangeReqData.html
-     * @param int $partyId party_room_info'id
+     * @param int $partyId 'id
      * @param int $userId
      * @param string $mgId SudGameConst::
      */
-    public function gameEnd(int $userId, int $partyId, string $mgId = '')
+    public function gameEnd(int $userId,  $roomId, string $mgId = '')
     {
-        $roomId = $this->getYunxinRoomId($partyId);
         if (!$roomId) {
             throw new Exception('未获取到room_id');
         }
@@ -486,12 +463,11 @@ class SudGameRequestApi
      * "ai_level":1   添加ai等级    0：简单ai 1：简单ai 2：中级ai 3：高级ai
      * }]
      * @param string $mg_id 游戏id SudGameConst::
-     * @param int $partyId party_room_info'id
+     * @param int $partyId 'id
      * @param array $aiPlayers
      */
-    public function aiAdd(int $partyId, array $aiPlayers = [], string $mg_id = '')
+    public function aiAdd( $roomId, array $aiPlayers = [], string $mg_id = '')
     {
-        $roomId = $this->getYunxinRoomId($partyId);
         if (!$roomId) {
             throw new Exception('未获取到room_id');
         }
@@ -507,12 +483,10 @@ class SudGameRequestApi
     /**
      * 获取房间座位列表
      * @see https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/RoomInfoReqData.html
-     * @param int $partyId party_room_info'id
+     * @param int $partyId 'id
      */
-    public function getRoomInfo(int $partyId, $mgId)
+    public function getRoomInfo($roomId, $mgId)
     {
-        //炸金花这类betting游戏是不支持服务端API接口的
-        $roomId = $this->getYunxinRoomId($partyId);
         if (!$roomId) {
             throw new Exception('未获取到room_id');
         }
@@ -527,12 +501,11 @@ class SudGameRequestApi
     /**
      * 房间清理
      * @see https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/RoomClearReqData.html
-     * @param int $partyId party_room_info'id
+     * @param int $partyId 'id
      * @param string $mg_id 游戏id SudGameConst::
      */
-    public function roomClear(int $partyId, string $mg_id)
+    public function roomClear( $roomId, string $mg_id)
     {
-        $roomId = $this->getYunxinRoomId($partyId);
         if (!$roomId) {
             throw new Exception('未获取到room_id');
         }
@@ -622,13 +595,11 @@ class SudGameRequestApi
     /**
      * 校验回调的签名值
      * 比较签名值 true: 验签成功， false: 验签失败
-     * @param Request $request
      * @return bool
      * @see https://docs.sud.tech/zh-CN/app/Server/HttpsCallback/CallbackSignatureVerify.html
      */
-    public function verifySignature(Request $request)
+    public function verifySignature(array $allHeaders,array $body)
     {
-        $allHeaders = $request->getHeaders();
         // SudAppId
         $sudAppId = $allHeaders["sud-appid"][0] ?? '';
         // SudTimestamp
@@ -638,7 +609,6 @@ class SudGameRequestApi
         // SudSignature
         $sudSignature = $allHeaders["sud-signature"][0] ?? '';
 
-        $body = $request->post();
 
 
         $signContent = sprintf("%s\n%s\n%s\n%s\n",
@@ -654,18 +624,6 @@ class SudGameRequestApi
         $bool = $sudSignature == $signature;
         return $bool;
     }
-
-
-    /**
-     * 返回云信room_id  eg:5384916988
-     * @param int $partyId party_room_info'id
-     *
-     */
-    public function getYunxinRoomId(int $partyId)
-    {
-        return RoomService::New()->getYunXinRoomId($partyId);
-    }
-
 
     /**
      *
@@ -691,14 +649,6 @@ class SudGameRequestApi
         return $language;
     }
 
-    /**
-     * @param int $userId
-     * @return mixed
-     */
-    public function getUserToken(int $userId)
-    {
-        return InfoService::New()->getUserExtendfield($userId, 'token');
-    }
 
 
 }
