@@ -1,0 +1,19 @@
+{
+    "name": "guanhui07/sudgame",
+    "autoload": {
+        "psr-4": {
+            "Guanhui07\\Sudgame\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yangminghui",
+            "email": "guanhui07@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3.0",
+        "guzzlehttp/guzzle": "~7.0"
+    }
+
+}
