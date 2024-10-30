@@ -190,8 +190,7 @@ class SudGameRequestApi
         ];
         $json = $this->getCurlData($url, $body);
 
-        $ret = json_decode($json, true);
-        return $ret;
+        return json_decode($json, true);
 
     }
 
